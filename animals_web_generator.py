@@ -7,38 +7,37 @@ def load_data():
         return json.load(handle)
 
 
+def serialize_animal(animal_obj):
+    output = ""
+    output += '<li class="cards__item">'
+    # Name
+    if "name" in animal_obj:
+        output += f"<div class='card__title'> Name: {animal_obj['name']}</div><br/>\n"
+
+    # Diet
+    diet = animal_obj.get("characteristics", {}).get("diet")
+    if diet:
+        output += f"<p class='card__text'> <strong> Diet: </strong> {diet}<br/>\n"
+
+    # Location (first in list)
+    locations = animal_obj.get("locations")
+    if locations and len(locations) > 0:
+        output += f"<strong> Location:</strong> {locations[0]}<br/>\n"
+
+    # Type
+    type_ = animal_obj.get("characteristics", {}).get("type")
+    if type_:
+        output += f"<strong> Type: </strong> {type_}<br/>\n"
+
+    output += '</p> </li>\n'
+    return output
+
+
 def print_animals(data):
     """Iterates through animals and prints selected info"""
     output = ""
     for animal in data:
-        #appending CSS-Class "cards__item" to html output
-        output += '<li class="cards__item">'
-        # Name
-        if "name" in animal:
-            # print(f"Name: {animal['name']}")
-            output += f"Name: {animal['name']}<br/>\n"
-
-        # Diet
-        diet = animal.get("characteristics", {}).get("diet")
-        if diet:
-            # print(f"Diet: {diet}")
-            output += f"Diet: {diet}<br/>\n"
-
-        # Location (first in list)
-        locations = animal.get("locations")
-        if locations and len(locations) > 0:
-            # print(f"Location: {locations[0]}")
-            output += f"Location: {locations[0]}<br/>\n"
-
-        # Type
-        type_ = animal.get("characteristics", {}).get("type")
-        if type_:
-            # print(f"Type: {type_}")
-            output += f"Type: {type_}<br/>\n\n"
-        if not type_:
-            output += f"\n"
-        output += '</li>'
-
+        output += serialize_animal(animal)
     return output
 
 
@@ -49,7 +48,7 @@ def read_html():
     return html_content
 
 
-def replace_placeholder(data):
+def replace_placeholder(data, html_input):
     # replace placeholder with animal info
     return html_input.replace("__REPLACE_ANIMALS_INFO__", data)
 
@@ -59,11 +58,13 @@ def save_data(data):
         file.write(data)
 
 
-if __name__ == "__main__":
+def main():
     animals = load_data()
     output_string = print_animals(animals)
     html_input = read_html()
-    html_output = replace_placeholder(output_string)
+    html_output = replace_placeholder(output_string, html_input)
     save_data(html_output)
-    print(html_output)
-    print(output_string)
+
+
+if __name__ == "__main__":
+    main()
